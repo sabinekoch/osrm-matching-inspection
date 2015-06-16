@@ -24,9 +24,13 @@ module.exports = function(app, db, osrm) {
           return;
         }
         total = result.total;
-        if (total > 100) total = 100;
+        if (total > 200) total = 200;
+        
+        var list = [];
+        for (i = 0; i< total; i++) {
+          list.push(i)}
 
-        for (subId = 0; subId < total; subId++) {
+        list.forEach( function(subId){
           matchTrace(id, subId, osrm, row.file, function(err, result) {
             if (err) {
               res.send(JSON.stringify({status: "error"}));
@@ -48,7 +52,7 @@ module.exports = function(app, db, osrm) {
               } else fs.appendFile(file_match, ",\n");
             });
           });
-        };
+        });
       });
     });
   });
