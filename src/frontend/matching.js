@@ -12,22 +12,15 @@ var diagram = require('./diagram.js'),
     file_name, route_id,
     trellis;
 
-function saveAll(total) {
-  var url = 'http://localhost:8337/match_save';
+function saveAll() {
+  var url = 'http://localhost:8337/match_save/'+history[history.length - 1];
   $('#loader').css('display', 'initial'); 
-  request({method:'POST', url:url, 
-    body:('{"total":"' + total + '"}'), json:true},
-
-    function (er, response, body) {
-      if(er) throw er;
-      else {
-        $("#save_all").attr('disabled','disabled');
-        $('#loader').css('display', 'none'); 
-        window.open('./data/export_matching.geojson');
-        $("#probs").append("<span style ='font-size:10px; padding-left: 2px'>Features saved!</span>");
-      }
-    }
-  );
+  $.getJSON(url, function(data) {
+      $("#save_all").attr('disabled','disabled');
+      $('#loader').css('display', 'none'); 
+      window.open(data);
+      $("#probs").append("<span id = 'confirmation' style ='font-size:10px; padding-left: 2px'>Features saved!</span>");
+  });
 }
 
 function commentCurrentMatching(id) {
@@ -37,9 +30,11 @@ function commentCurrentMatching(id) {
   if ($('#other').val()){
     comment += $('#other').val()
   }
+  if (route_id) r_id = route_id.toString()
+  else r_id = ''; 
   request({method:'POST', url:url, 
     body:('{"file_name":"' + file_name + 
-      '", "route_id":"' + route_id.toString() + 
+      '", "route_id":"' + r_id + 
       '", "confidence":"' + confidence_total.toString() + 
       '" , "comment": "' + comment + '"}'), json:true},
     function (er, response, body) {
@@ -67,9 +62,10 @@ function onMatched(response) {
       matchings = response.matchings,
       trace = response.trace;
   confidence_total = 0;
-  route_id = response.route_id;
   file_name = response.file_name;
-  
+  if (response.route_Id) {
+    route_id = response.route_id;
+  };
   if (traceLine) map.removeLayer(traceLine);
   d3.selectAll("#trellis").remove();
   d3.select("#show_trellis").property('checked', true);
@@ -78,6 +74,7 @@ function onMatched(response) {
   
   current_subId = response.subId;
   total = response.total;
+  
   matchings.forEach(function (t) {confidence_total += t.confidence});
   if (matchings.length > 1) confidence_total /= 2;  
   confidence_total = Math.round((confidence_total/matchings.length).toFixed(4)*10000)/100;
@@ -94,7 +91,7 @@ function onMatched(response) {
 
     $("#routenumber").text("Route " + (current_subId + 1) + " of " + total);
     $("#confidence").text("Confidence: " + confidence_total)
-    if (matchings.length > 1) {$("#subtraces").text(" ("+matchings.length+" subtraces)")} else $("#subtraces").text("") 
+    if (matchings.length > 1) {$("#subtraces").text(" (" + matchings.length + " subtraces)")} else $("#subtraces").text("") 
     if (response.route_long_name) {
       $("#long_name").text(response.route_long_name).attr("display", "inline")
     } else $("#long_name").attr("display", "none");
@@ -110,6 +107,9 @@ function showMatching(id, next) {
   $('#comment').val('');
   $('#other').val('').remove();
   if ((total - current_subId) > 1) id--, current_subId++;
+  else {$("#save_all").removeAttr('disabled');
+      $("#confirmation").css("display", "none");
+  }
 
   if (id !== undefined) url += '/' + id;
   if (next !== undefined) url += '/next';
@@ -141,7 +141,6 @@ function showPrevMatching() {
     history.pop();
     history.pop();
     direction = 'previous';
-
   }
 }
 
@@ -169,6 +168,7 @@ $("#probs")
   .append("<p id = 'route_info'/>")
   .append("<p id = 'user_input'/>")
   .append("<button id = 'save_all'>Save all matchings!</button>")
+  .append("<img src = './css/loader2.gif' id ='loader'/>")
 
 $("#user_input")
   .append("Comment:</br><select id = 'comment'/>")
@@ -212,8 +212,7 @@ $(document).ready(function(){
 });
 
 $('#save_all')
-    .click(function(){
-      $.getJSON('http://localhost:8337/match/0/0', function(result){
-      saveAll(result.total)
-    });  
-  });
+    .click(function( event ) {
+      event.preventDefault();
+      saveAll();
+    });

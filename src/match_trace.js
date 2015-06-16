@@ -126,7 +126,7 @@ function filterGeoJSON(geojson, subId) {
   return outputGeoJSON;
 }
 
-function matchTrace(subId, osrm, file, options, callback) {
+function matchTrace(id, subId, osrm, file, options, callback) {
   if (typeof options === 'function' && callback === undefined) {
       callback = options;
   }
