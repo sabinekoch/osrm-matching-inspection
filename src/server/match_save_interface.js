@@ -24,7 +24,7 @@ module.exports = function(app, db, osrm) {
           return;
         }
         total = result.total;
-        if (total > 25) total = 25;
+        if (total > 100) total = 100;
 
         for (subId = 0; subId < total; subId++) {
           matchTrace(id, subId, osrm, row.file, function(err, result) {

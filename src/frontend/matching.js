@@ -136,8 +136,8 @@ function showPrevMatching() {
   }
 }
 
-L.mapbox.accessToken = 'pk.eyJ1IjoidGhlbWFyZXgiLCJhIjoiSXE4SDlndyJ9.ihcqCB31K7RtzmMDhPzW2g';
-var map = L.mapbox.map('map', 'themarex.kel82add'),
+L.mapbox.accessToken = 'pk.eyJ1IjoiYWxscnlkZXIiLCJhIjoidWs5cUFfRSJ9.t8kxvO3nIhCaAl07-4lkNw';
+var map = L.mapbox.map('map', 'mapbox.streets' ),
     edit = new L.Control.EditInOSM({position: 'topright', widget: 'multiButton', editors: ['id']}),
     control = new L.control.layers({
       'Streets': L.mapbox.tileLayer('mapbox.streets').addTo(map),
