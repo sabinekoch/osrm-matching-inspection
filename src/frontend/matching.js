@@ -79,7 +79,7 @@ function onMatched(response) {
   current_subId = response.subId;
   total = response.total;
   matchings.forEach(function (t) {confidence_total += t.confidence});
-/*  if (matchings.length > 1) confidence_total /= 2;*/  
+  if (matchings.length > 1) confidence_total /= 2;  
   confidence_total = Math.round((confidence_total/matchings.length).toFixed(4)*10000)/100;
 
   if (confidence_total <= $('#confi').val()){
