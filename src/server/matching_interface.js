@@ -4,9 +4,6 @@ module.exports = function(app, db, osrm) {
   app.get('/match/:id/:subId', function(req, res) {
     var id = parseInt(req.params.id),
         subId = parseInt(req.params.subId);
-console.log('id')
-console.log(id)
-
     db.get("SELECT file FROM traces WHERE id = ? LIMIT 1", id, function(err, row) {
       if (err) {
         res.send(JSON.stringify({status: "error", message: err.message}));

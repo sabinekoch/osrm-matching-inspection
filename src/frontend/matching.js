@@ -19,22 +19,17 @@ function saveAll() {
       $("#save_all").attr('disabled','disabled');
       $('#loader').css('display', 'none'); 
       window.open(data);
-      $("#probs").append("<span id = 'confirmation' style ='font-size:10px; padding-left: 2px'>Features saved!</span>");
+      $("#probs").append("<span id = 'confirmation'>Features saved!</span>");
   });
 }
 
 function commentCurrentMatching(id) {
   $("#comment_saved").css('display','none');
   var url = 'http://localhost:8337/comment',
-      comment = $('#comment').val();
-  if ($('#other').val()){
-    comment += $('#other').val()
-  }
-  if (route_id) r_id = route_id.toString()
-  else r_id = ''; 
+      comment = ($('#comment').val() + $('#other').val());
   request({method:'POST', url:url, 
     body:('{"file_name":"' + file_name + 
-      '", "route_id":"' + r_id + 
+      '", "route_id":"' +  route_id.toString() + 
       '", "confidence":"' + confidence_total.toString() + 
       '" , "comment": "' + comment + '"}'), json:true},
     function (er, response, body) {
@@ -63,9 +58,8 @@ function onMatched(response) {
       trace = response.trace;
   confidence_total = 0;
   file_name = response.file_name;
-  if (response.route_Id) {
-    route_id = response.route_id;
-  };
+  route_id = response.route_id;
+ 
   if (traceLine) map.removeLayer(traceLine);
   d3.selectAll("#trellis").remove();
   d3.select("#show_trellis").property('checked', true);
@@ -92,9 +86,7 @@ function onMatched(response) {
     $("#routenumber").text("Route " + (current_subId + 1) + " of " + total);
     $("#confidence").text("Confidence: " + confidence_total)
     if (matchings.length > 1) {$("#subtraces").text(" (" + matchings.length + " subtraces)")} else $("#subtraces").text("") 
-    if (response.route_long_name) {
-      $("#long_name").text(response.route_long_name).attr("display", "inline")
-    } else $("#long_name").attr("display", "none");
+    $("#long_name").text(response.route_long_name).attr("display", "inline")
 
   } else {
     if (direction === 'previous') showPrevMatching(); 
@@ -203,7 +195,7 @@ $(document).ready(function(){
             $('#info').slideDown();
             $('.leaflet-marker-icon').css('display', 'initial');
             $('.candidate_points').css('display', 'initial');
-        } else{
+        } else {
             $('#info').slideUp();
             $('.leaflet-marker-icon').css('display', 'none');
             $('.candidate_points').css('display', 'none');

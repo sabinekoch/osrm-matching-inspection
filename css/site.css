@@ -104,3 +104,8 @@
   padding-left: 2px;
   display : none
 }
+
+#confirmation {
+  font-size:10px; 
+  padding-left: 2px
+}

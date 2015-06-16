@@ -13,7 +13,6 @@ module.exports = function(app, db, osrm) {
         res.send(JSON.stringify({status: "error"}));
         return;
       }
-      console.log(row.file)
       var file_match = "./" + row.file.split('.')[0] + "_matched.geojson",
           file_start = '{\n"type": "FeatureCollection",\n"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },\n\n"features": [\n\n';
 
@@ -26,20 +25,20 @@ module.exports = function(app, db, osrm) {
         }
         total = result.total;
         if (total > 25) total = 25;
- 
+
         for (subId = 0; subId < total; subId++) {
           matchTrace(id, subId, osrm, row.file, function(err, result) {
             if (err) {
               res.send(JSON.stringify({status: "error"}));
               return;
             }
+            sum ++;
             if (!result.route_id) result.route_id = -1;
             var feature_start = 
               '{ "type": "Feature", "properties": { "route_id":' + result.route_id +
               ', "route_short_name": "' + result.route_short_name +
               '" , "route_long_name": "' + result.route_long_name +
               '"}, "geometry": { "type": "LineString", "coordinates":';
-            sum ++;
     
             result.matchings.forEach( function (matching){
               fs.appendFile(file_match, (feature_start + JSON.stringify(matching.matched_points) + " } }"));

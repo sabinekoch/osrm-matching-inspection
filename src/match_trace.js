@@ -23,7 +23,6 @@ function geojsonToTrace(geojson) {
       trace.timestamps = feature.properties.coordTimes.map(function(t) { return parseInt(t); });
     }
   }
-
   return trace;
 }
 
@@ -158,12 +157,17 @@ function matchTrace(id, subId, osrm, file, options, callback) {
       result.trace = trace;
       result.subId = subId;
       result.total = geojson.features.length;
+      result.file_name = file.split('/')[1];
       if (geojson.features[subId].properties.route_id){
-        result.file_name = file.split('/')[1];
         result.route_id = geojson.features[subId].properties.route_id;
         result.route_short_name = geojson.features[subId].properties.route_short_name;
         result.route_long_name = geojson.features[subId].properties.route_long_name; 
+      } else {
+        result.route_id = '';
+        result.route_short_name = '';
+        result.route_long_name = ''; 
       }
+
       callback(null, result);
     });
   });
