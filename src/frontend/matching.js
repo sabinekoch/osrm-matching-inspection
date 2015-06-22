@@ -83,7 +83,7 @@ function onMatched(response) {
     trellis.on('transitionselected', updateTransitionInfo);
     map.fitBounds(matchingLayer.getBounds());
 
-    $("#routenumber").text("Route " + (current_subId + 1) + " of " + total);
+    $("#routenumber").text("Route_id: " + (response.route_id) + " (total: " + total + ")");
     $("#confidence").text("Confidence: " + confidence_total)
     if (matchings.length > 1) {$("#subtraces").text(" (" + matchings.length + " subtraces)")} else $("#subtraces").text("") 
     $("#long_name").text(response.route_long_name).attr("display", "inline")
@@ -96,6 +96,8 @@ function onMatched(response) {
 
 function showMatching(id, next) {
   var url = 'http://localhost:8337/trace/unknown';
+  // $('#route_id').val('');
+
   $('#comment').val('');
   $('#other').val('').remove();
   if ((total - current_subId) > 1) id--, current_subId++;

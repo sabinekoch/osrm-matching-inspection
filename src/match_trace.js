@@ -134,6 +134,7 @@ function matchTrace(id, subId, osrm, file, options, callback) {
       callback(err);
       return;
     }
+
     var trace = geojsonToTrace(filterGeoJSON(geojson, subId));
 
     if (trace.coordinates.length < 2)

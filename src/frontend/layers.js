@@ -83,7 +83,7 @@ var DebugMatchingLayer = MatchingLayer.extend({
 
     m.persistent = m.persistent || persistent;
 
-    m.setStyle({radius: 14, fillOpacity: 0.9, stroke: true, weight: 1, color: '#000', opacity: 0.8});
+    m.setStyle({radius: 20, fillOpacity: 0.9, stroke: true, weight: 1, color: '#000', opacity: 0.8});
   },
 
   restoreCandidate: function(idx, force) {

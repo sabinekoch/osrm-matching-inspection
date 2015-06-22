@@ -24,7 +24,7 @@ module.exports = function(app, db, osrm) {
           return;
         }
         total = result.total;
-        if (total > 200) total = 200;
+        if (total > 100) total = 100;
         
         var list = [];
         for (i = 0; i< total; i++) {
