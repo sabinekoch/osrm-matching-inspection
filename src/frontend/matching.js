@@ -1,5 +1,3 @@
-
-
 var diagram = require('./diagram.js'),
     colors = require('./colors.js'),
     layers = require('./layers.js'),
@@ -84,7 +82,7 @@ function onMatched(response) {
     trellis = diagram.trellis(d3.select("#info"), matchingLayer, states, breakage);
     trellis.on('transitionselected', updateTransitionInfo);
     map.fitBounds(matchingLayer.getBounds());
-console.log(response)
+
     $("#routenumber").text("Route_id: " + (response.route_id) + " (total: " + total + ")");
     $("#confidence").text("Confidence: " + confidence_total)
     if (matchings.length > 1) {$("#subtraces").text(" (" + matchings.length + " subtraces)")} else $("#subtraces").text("") 

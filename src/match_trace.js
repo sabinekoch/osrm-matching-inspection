@@ -6,9 +6,8 @@ var csv2geojson = require('csv2geojson'),
     turf = require('turf');
 
 function geojsonToTrace(geojson) {
-  
   var trace = {
-        coordinates: []
+      coordinates: []
       },
       feature;
 
@@ -16,15 +15,14 @@ function geojsonToTrace(geojson) {
       geojson.features &&
       geojson.features.length &&
       geojson.features[0].geometry) {
-    feature = geojson.features[0];
 
+    feature = geojson.features[0];
     trace.coordinates = feature.geometry.coordinates.map(function(d) {return [d[1], d[0]];});
     if (feature.properties &&
         feature.properties.coordTimes) {
       trace.timestamps = feature.properties.coordTimes.map(function(t) { return parseInt(t); });
     }
   }
-
   return trace;
 }
 
@@ -50,8 +48,6 @@ function fileToGeoJSON(file, callback) {
   });
 }
 
-// reduce sample rate to sane value filter blobs
-// subId: id of feature in file 
 function filterGeoJSON(geojson, subId) {
   var outputLine = turf.linestring([]),
       outputGeoJSON = turf.featurecollection([]),
@@ -127,16 +123,21 @@ function filterGeoJSON(geojson, subId) {
   return outputGeoJSON;
 }
 
-function matchTrace(subId, osrm, file, options, callback) {
+function matchTrace(subId,id, osrm, file, options, callback) {
+
   if (typeof options === 'function' && callback === undefined) {
       callback = options;
   }
+ 
   fileToGeoJSON(file, function onGeojson(err, geojson) {
+   
     if (err) {
       callback(err);
       return;
     }
+  
     var trace = geojsonToTrace(filterGeoJSON(geojson, subId));
+  
 
     if (trace.coordinates.length < 2)
     {
@@ -149,7 +150,6 @@ function matchTrace(subId, osrm, file, options, callback) {
     for (var key in options) {
       trace[key] = options[key];
     }
-
     osrm.match(trace, function(err, result) {
       if (err) {
         callback(err, null);
@@ -157,11 +157,19 @@ function matchTrace(subId, osrm, file, options, callback) {
       }
       // also return original trace
       result.trace = trace;
+      result.id = id;
       result.subId = subId;
       result.total = geojson.features.length;
+
+      if (geojson.features[subId].properties.route_id){
+        result.file_name = file.split('/')[1];
+        result.route_id = geojson.features[subId].properties.route_id;
+        result.route_short_name = geojson.features[subId].properties.route_short_name;
+        result.route_long_name = geojson.features[subId].properties.route_long_name; 
+      }
       callback(null, result);
+
     });
   });
 }
-
 module.exports = matchTrace;
