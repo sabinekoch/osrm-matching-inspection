@@ -6,6 +6,7 @@ var csv2geojson = require('csv2geojson'),
     turf = require('turf');
 
 function geojsonToTrace(geojson) {
+  
   var trace = {
         coordinates: []
       },
@@ -23,6 +24,7 @@ function geojsonToTrace(geojson) {
       trace.timestamps = feature.properties.coordTimes.map(function(t) { return parseInt(t); });
     }
   }
+
   return trace;
 }
 
@@ -125,7 +127,7 @@ function filterGeoJSON(geojson, subId) {
   return outputGeoJSON;
 }
 
-function matchTrace(id, subId, osrm, file, options, callback) {
+function matchTrace(subId, osrm, file, options, callback) {
   if (typeof options === 'function' && callback === undefined) {
       callback = options;
   }
@@ -134,7 +136,6 @@ function matchTrace(id, subId, osrm, file, options, callback) {
       callback(err);
       return;
     }
-
     var trace = geojsonToTrace(filterGeoJSON(geojson, subId));
 
     if (trace.coordinates.length < 2)
@@ -158,17 +159,6 @@ function matchTrace(id, subId, osrm, file, options, callback) {
       result.trace = trace;
       result.subId = subId;
       result.total = geojson.features.length;
-      result.file_name = file.split('/')[1];
-      if (geojson.features[subId].properties.route_id){
-        result.route_id = geojson.features[subId].properties.route_id;
-        result.route_short_name = geojson.features[subId].properties.route_short_name;
-        result.route_long_name = geojson.features[subId].properties.route_long_name; 
-      } else {
-        result.route_id = '';
-        result.route_short_name = '';
-        result.route_long_name = ''; 
-      }
-
       callback(null, result);
     });
   });
