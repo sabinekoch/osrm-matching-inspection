@@ -1,5 +1,6 @@
 var matchTrace = require('../match_trace.js'),
     fs = require('fs');
+    var polyline = require('polyline');
 
 module.exports = function(app, db, osrm) {
   app.get('/match_save/:id', function(req, res) {
@@ -18,7 +19,7 @@ module.exports = function(app, db, osrm) {
 
       fs.writeFileSync(file_match, file_start, "UTF-8",{'flags': 'w+'});
 
-      matchTrace(id, 0, osrm, row.file, function(err, result) {
+      matchTrace( 0,id, osrm, row.file, function(err, result) {
         if (err) {
           res.send(JSON.stringify({status: "error"}));
           return;
@@ -30,25 +31,53 @@ module.exports = function(app, db, osrm) {
         for (i = 0; i< total; i++) {
           list.push(i)}
 
-        list.forEach( function(subId){
-          matchTrace(id, subId, osrm, row.file, function(err, result) {
+        list.forEach( function(element){
+          matchTrace( element,id, osrm, row.file, function(err, result) {
+            sum ++;
+     
             if (err) {
               res.send(JSON.stringify({status: "error"}));
               return;
             }
-            sum ++;
-            if (!result.route_id) result.route_id = -1;
+            
+            // if (!result.route_id) result.route_id = -1;
             var feature_start = 
               '{ "type": "Feature", "properties": { "route_id":' + result.route_id +
               ', "route_short_name": "' + result.route_short_name +
               '" , "route_long_name": "' + result.route_long_name +
               '"}, "geometry": { "type": "LineString", "coordinates":';
-    
+            
+            // var unique = {};
+            // var distinct = [];
+            // result.route_id.forEach(function (x) {
+            //   if (!unique[x.age]) {
+            //     distinct.push(x.age);
+            //     unique[x.age] = true;
+            //   }
+            // });
+            // console.log(unique)
+            fs.appendFile(file_match, (feature_start));
             result.matchings.forEach( function (matching){
-              fs.appendFile(file_match, (feature_start + JSON.stringify(matching.matched_points) + " } }"));
+              // console.log(polyline.decode(matching.geometry, 6).length) 
+              var geometry_matched = []
+              polyline.decode(matching.geometry, 6).forEach( function (geom_elem){ 
+              
+                // console.log("elem")
+                // console.log(geom_elem)
+
+                var b = geom_elem[0];
+                    geom_elem[0] = geom_elem[1];
+                    geom_elem[1] = b;
+                // console.log(geom_elem)
+
+                geometry_matched.push(geom_elem)
+              })
+              fs.appendFile(file_match, (JSON.stringify(geometry_matched) + " }}"));
+
+              // fs.appendFile(file_match, (feature_start + JSON.stringify(matching.matched_points) + " } }"));
               if (sum === total){
                 fs.appendFile(file_match, "\n]\n}");
-                res.send(JSON.stringify(file_match));
+                // res.send(JSON.stringify(file_match));
               } else fs.appendFile(file_match, ",\n");
             });
           });
@@ -57,3 +86,4 @@ module.exports = function(app, db, osrm) {
     });
   });
 }
+

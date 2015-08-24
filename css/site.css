@@ -111,3 +111,8 @@
   font-size:10px; 
   padding-left: 2px
 }
+
+#select_number {
+  margin: 5px;
+  width:20%;
+}
