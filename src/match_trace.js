@@ -67,25 +67,26 @@ function filterGeoJSON(geojson, subId) {
         newTimes = [];
 
     // added no times option
-    if (times && !times[subId].match(/^\d+$/)) {
-      // check if for special fucked up date format.
-      if (times[subId].match(/^\d\d\d\d-\d-\d\d/)) {
-        times = times.map(function (t) {
-            return Math.floor(moment(t, "YYYY-M-DDTHH:mm:ss") / 1000);
-        });
-      } else {
-        times = times.map(function(t) {
-            // js returns dates in milliseconds since epoch
-            return Math.floor(Date.parse(t.trim()) / 1000);
-        });
-      }
-    // milli-second based timestamp
-    } else if (times && Math.log(parseInt(times[subId])) > 23) {
-      times = times.map(function(t) { return Math.floor(parseInt(t) / 1000); });
-    } else {
-        times = undefined;
-    }
-
+    console.log(times)
+    // if (times && !times[subId].match(/^\d+$/)) {
+    //   // check if for special fucked up date format.
+    //   if (times[subId].match(/^\d\d\d\d-\d-\d\d/)) {
+    //     times = times.map(function (t) {
+    //         return Math.floor(moment(t, "YYYY-M-DDTHH:mm:ss") / 1000);
+    //     });
+    //   } else {
+    //     times = times.map(function(t) {
+    //         // js returns dates in milliseconds since epoch
+    //         return Math.floor(Date.parse(t.trim()) / 1000);
+    //     });
+    //   }
+    // // milli-second based timestamp
+    // } else if (times && Math.log(parseInt(times[subId])) > 23) {
+    //   times = times.map(function(t) { return Math.floor(parseInt(t) / 1000); });
+    // } else {
+    //     times = undefined;
+    // }
+    times = undefined
     newCoords = coords.filter(function(coord, i) {
       var p = turf.point(coord),
           takePoint = true;
@@ -141,8 +142,14 @@ function matchTrace(subId,id, osrm, file, options, callback) {
 
     if (trace.coordinates.length < 2)
     {
-        callback(new Error("Trace should at least contain two points!"));
+        // callback(new Error("Trace should at least contain two points!"));
+        // return;
+        result = {}
+        result.id = id;
+        result.subId = subId;
+        callback(null, result);
         return;
+
     }
 
     trace.classify = true;

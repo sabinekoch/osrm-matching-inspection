@@ -56,6 +56,7 @@ function updateTransitionInfo(p) {
 }
 
 function onMatched(response) {
+  console.log(response)
     var states = response.debug.states,
         breakage = response.debug.breakage,
         matchings = response.matchings,
